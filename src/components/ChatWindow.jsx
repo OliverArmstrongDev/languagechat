@@ -4,7 +4,8 @@ import './ChatWindow.css'
 const ChatWindow = () => {
   const [newMessage, setNewMessage] = useState('')
   const [messageArray, setMessageArray] = useState([])
-
+  const [translatedText, setTranslatedText] = useState('')
+  const [idxToTranslate, setIdxToTranslate] = useState('')
 
   const apiUrl = process.env.REACT_APP_API_URL
 
@@ -44,6 +45,17 @@ const ChatWindow = () => {
     return response.json()
   }
 
+  const handleTranslate = async (text, index) => {
+    setIdxToTranslate(index);
+    setTranslatedText("Translating...");
+    const toTranslate = `translate to english ${text}`
+
+    const translated = await postData(apiUrl, {
+      prompt: toTranslate,
+    })
+    setTranslatedText(translated.message)
+  }
+
   console.log(messageArray)
 
   return (
@@ -51,10 +63,32 @@ const ChatWindow = () => {
       <h1>Ollie's Language Chatbot</h1>
       <p>Type in any language to chat with the AI bot.</p>
       <p>DO NOT enter any personal details!</p>
+      <p>{idxToTranslate}</p>
       <form onSubmit={handleSubmit} className="chatform">
         <div className="message-container">
           {messageArray.map((message, idx) => {
-            return <p className={idx %2 ? 'message-bubble-bot' : 'message-bubble-human'} key={idx}>{message}</p>
+            return (
+              <div className="message" key={idx}>
+                <p
+                  className={
+                    idx % 2 ? 'message-bubble-bot' : 'message-bubble-human'
+                  }
+                  key={idx}
+                >
+                  {message}
+                </p>
+                {idxToTranslate !== idx && (
+                 <div className={
+                    idx % 2 ? 'bot-span' : 'human-span'
+                  }> <span onClick={() => handleTranslate(message, idx)}>
+                    Translate
+                  </span> </div>
+                )}
+
+                {idxToTranslate === idx && <span className={ idx % 2 ? 'bot-span' : 'human-span'}>
+                    {translatedText}</span>}
+              </div>
+            )
           })}
         </div>
 
