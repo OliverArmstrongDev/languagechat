@@ -5,23 +5,21 @@ const ChatWindow = () => {
   const [newMessage, setNewMessage] = useState('')
   const [messageArray, setMessageArray] = useState([])
 
-  const apiUrl = process.env.REACT_APP_API_URL;
-  console.log(apiUrl)
-  
+
+  const apiUrl = process.env.REACT_APP_API_URL
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (newMessage !== '') {
-        setNewMessage('')
+      setNewMessage('')
       setMessageArray((oldArray) => [...oldArray, newMessage])
 
-      const result = await postData(apiUrl , {
+      const result = await postData(apiUrl, {
         prompt: newMessage,
       })
 
       if (result.message) {
         setMessageArray((oldArray) => [...oldArray, result.message])
-       
       }
     }
   }
@@ -56,10 +54,10 @@ const ChatWindow = () => {
       <form onSubmit={handleSubmit} className="chatform">
         <div className="message-container">
           {messageArray.map((message, idx) => {
-            return <p key={idx}>{message}</p>
+            return <p className={idx %2 ? 'message-bubble-bot' : 'message-bubble-human'} key={idx}>{message}</p>
           })}
         </div>
-       
+
         <div className="message-controls">
           <input
             onChange={(e) => handleMessageChange(e.target.value)}
@@ -68,7 +66,7 @@ const ChatWindow = () => {
             value={newMessage}
           />
           <button
-          id='message-button'
+            id="message-button"
             className="btn-submit"
             onClick={(e) => handleSubmit(e)}
             type="submit"
@@ -76,7 +74,7 @@ const ChatWindow = () => {
             Send
           </button>
         </div>
-       </form>
+      </form>
     </div>
   )
 }
