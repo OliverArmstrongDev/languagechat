@@ -6,6 +6,7 @@ const ChatWindow = () => {
   const [messageArray, setMessageArray] = useState([])
   const [translatedText, setTranslatedText] = useState('')
   const [idxToTranslate, setIdxToTranslate] = useState('')
+  const [translateLang, setTranslateLang] = useState('')
 
   const apiUrl = process.env.REACT_APP_API_URL
 
@@ -45,10 +46,16 @@ const ChatWindow = () => {
     return response.json()
   }
 
+  const handleTranslateChange = async (val) => {
+    console.log(val)
+    
+    setTranslateLang(val);
+  }
+
   const handleTranslate = async (text, index) => {
-    setIdxToTranslate(index);
-    setTranslatedText("Translating...");
-    const toTranslate = `translate to english ${text}`
+    setIdxToTranslate(index)
+    setTranslatedText('Translating...')
+    const toTranslate = `translate to ${translateLang} ${text}`
 
     const translated = await postData(apiUrl, {
       prompt: toTranslate,
@@ -56,14 +63,20 @@ const ChatWindow = () => {
     setTranslatedText(translated.message)
   }
 
-  console.log(messageArray)
-
   return (
     <div className="chatwindow-container">
       <h1>Ollie's Language Chatbot</h1>
       <p>Type in any language to chat with the AI bot.</p>
       <p>DO NOT enter any personal details!</p>
-      <p>{idxToTranslate}</p>
+      <div className='translate-select'>
+        <h6>Translate language:</h6>
+        <select onChange={(e) => handleTranslateChange(e.target.value)}>
+          <option value="english">English</option>
+          <option value="german">German</option>
+          <option value="spanish">Spanish</option>
+        </select>
+      </div>
+
       <form onSubmit={handleSubmit} className="chatform">
         <div className="message-container">
           {messageArray.map((message, idx) => {
@@ -78,20 +91,24 @@ const ChatWindow = () => {
                   {message}
                 </p>
                 {idxToTranslate !== idx && (
-                 <div className={
-                    idx % 2 ? 'bot-span' : 'human-span'
-                  }> <span onClick={() => handleTranslate(message, idx)}>
-                    Translate
-                  </span> </div>
+                  <div className={idx % 2 ? 'bot-span' : 'human-span'}>
+                    {' '}
+                    <span onClick={() => handleTranslate(message, idx)}>
+                      Translate
+                    </span>{' '}
+                  </div>
                 )}
 
-                {idxToTranslate === idx && <span className={ idx % 2 ? 'bot-span' : 'human-span'}>
-                    {translatedText}</span>}
+                {idxToTranslate === idx && (
+                  <span className={idx % 2 ? 'bot-span' : 'human-span'}>
+                    {translatedText}
+                  </span>
+                )}
               </div>
             )
           })}
         </div>
-
+        <div className="message-controls-container">
         <div className="message-controls">
           <input
             onChange={(e) => handleMessageChange(e.target.value)}
@@ -107,6 +124,7 @@ const ChatWindow = () => {
           >
             Send
           </button>
+        </div>
         </div>
       </form>
     </div>
